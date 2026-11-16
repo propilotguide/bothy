@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { updateTimeZone } from "../actions";
 import { signOut } from "../login/actions";
 import TokenPanel from "./TokenPanel";
+import { siteUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export default async function SettingsPage() {
     supabase.from("api_tokens").select("id", { count: "exact", head: true }),
   ]);
   const tz = profile?.tz ?? "America/Los_Angeles";
-  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const site = siteUrl();
 
   return (
     <>
