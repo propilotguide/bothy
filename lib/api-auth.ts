@@ -12,17 +12,25 @@ export function newToken(): string {
 
 export type ApiUser = { userId: string; tz: string };
 
-/** Matches the request's `Authorization: Bearer <token>` header to a user. */
-export async function authenticate(request: Request): Promise<ApiUser | null> {
-  const header = request.headers.get("authorization") ?? "";
-  const match = header.match(/^Bearer\s+(\S+)$/i);
-  if (!match) return null;
+/**
+ * Finds the user for a Shortcuts request. The token can come from the
+ * `Authorization: Bearer <token>` header, or (simpler to set up in Shortcuts)
+ * a "token" field in the JSON body or the URL.
+ */
+export async function authenticate(request: Request, bodyToken?: unknown): Promise<ApiUser | null> {
+  const header = (request.headers.get("authorization") ?? "").trim();
+  const fromHeader = header.match(/^Bearer\s+(\S+)$/i)?.[1];
+  const fromBody = typeof bodyToken === "string" ? bodyToken.trim() : undefined;
+  const fromQuery = new URL(request.url).searchParams.get("token")?.trim() || undefined;
+  const raw = fromHeader ?? fromBody ?? fromQuery;
+  const plain = raw?.replace(/^Bearer\s+/i, "");
+  if (!plain) return null;
 
   const admin = createAdminClient();
   const { data: token } = await admin
     .from("api_tokens")
     .select("id, user_id")
-    .eq("token_hash", hashToken(match[1]))
+    .eq("token_hash", hashToken(plain))
     .maybeSingle();
   if (!token) return null;
 

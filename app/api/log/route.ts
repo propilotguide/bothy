@@ -11,15 +11,15 @@ import { isIsoDay, todayIn } from "@/lib/dates";
  * Replies with a short message the Shortcut can show, e.g. "Train ✓ · 2 of 3 this week".
  */
 export async function POST(request: Request) {
-  const auth = await authenticate(request);
-  if (!auth) return json({ ok: false, message: "Bad or missing token" }, 401);
-
   let body: { habit?: unknown; date?: unknown; done?: unknown };
   try {
     body = await request.json();
   } catch {
     return json({ ok: false, message: "Send JSON with a habit" }, 400);
   }
+
+  const auth = await authenticate(request, (body as Record<string, unknown>).token);
+  if (!auth) return json({ ok: false, message: "Bad or missing token" }, 401);
 
   const day = body.date === undefined || body.date === "" ? todayIn(auth.tz) : body.date;
   if (!isIsoDay(day)) return json({ ok: false, message: "date must look like 2026-11-14" }, 400);

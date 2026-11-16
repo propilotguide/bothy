@@ -17,20 +17,20 @@ import { STEPS_GOAL } from "@/lib/types";
  * Steps at or above 10,000 check off the "10k steps" habit for that day.
  */
 function num(v: unknown): number | null {
-  const n = typeof v === "string" ? Number(v.replace(/,/g, "")) : typeof v === "number" ? v : NaN;
+  const n = typeof v === "string" ? parseFloat(v.replace(/,/g, "")) : typeof v === "number" ? v : NaN;
   return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
 export async function POST(request: Request) {
-  const auth = await authenticate(request);
-  if (!auth) return json({ ok: false, message: "Bad or missing token" }, 401);
-
   let body: Record<string, unknown>;
   try {
     body = await request.json();
   } catch {
     return json({ ok: false, message: "Send JSON" }, 400);
   }
+
+  const auth = await authenticate(request, (body as Record<string, unknown>).token);
+  if (!auth) return json({ ok: false, message: "Bad or missing token" }, 401);
 
   const today = todayIn(auth.tz);
   const date = body.date ? body.date : today;
