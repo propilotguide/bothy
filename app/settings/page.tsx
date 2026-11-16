@@ -47,6 +47,9 @@ export default async function SettingsPage() {
 
       <section className="section">
         <h2 className="section-title">Habit names for Shortcuts</h2>
+        <p className="muted" style={{ margin: 0 }}>
+          To rename, reorder, add or archive habits, go to <Link href="/habits">Edit habits</Link>.
+        </p>
         <div className="card">
           <table className="table">
             <tbody>

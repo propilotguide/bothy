@@ -110,7 +110,8 @@ export default async function TodayPage({ searchParams }: { searchParams: Promis
 
       <div className="links">
         <Link href="/journal">Journal</Link>
-        <Link href="/settings">Settings &amp; Shortcuts</Link>
+        <Link href="/habits">Edit habits</Link>
+        <Link href="/settings">Settings</Link>
       </div>
     </>
   );
