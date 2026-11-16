@@ -83,10 +83,9 @@ All of it happens in the nightly sweep on the Today screen, in a few seconds:
 ## 4. Apple Shortcuts
 
 First, in the app: **Settings & Shortcuts → New token**, and copy it. Every Shortcut below
-sends it as a header:
-
-- Key: `Authorization`
-- Value: `Bearer ` then your token (one space after Bearer)
+sends it as a **Text** field named `token` in the JSON request body (paste it with Bothy's
+Copy token button, no "Bearer"). This is easier to set up than a header. An
+`Authorization: Bearer <token>` header also works if you prefer.
 
 Replace `YOUR-APP.vercel.app` with your address throughout.
 
@@ -96,13 +95,13 @@ Shows what's left today; pick one or more and they're logged.
 
 1. Shortcuts app → **+** → name it **Log a habit**.
 2. **Get Contents of URL** → `https://YOUR-APP.vercel.app/api/today`
-   Tap the arrow: Method **GET**, add the Authorization header.
+   Tap the arrow: Method **GET**. Add `?token=YOUR_TOKEN` to the end of the URL (GET requests have no body).
 3. **Get Dictionary Value** → Get **Value** for **remaining** in *Contents of URL*.
 4. **Choose from List** → *Dictionary Value*. Prompt: "Log which?" Turn on **Select Multiple**.
 5. **Repeat with Each** → *Chosen Item*. Inside the repeat:
    - **Get Contents of URL** → `https://YOUR-APP.vercel.app/api/log`
-     Method **POST**, Authorization header, Request Body **JSON**, add field
-     `habit` (Text) = *Repeat Item*.
+     Method **POST**, Request Body **JSON**, add fields
+     `habit` (Text) = *Repeat Item* and `token` (Text) = your token.
 6. After the repeat: **Show Notification** → "Logged".
 7. Shortcut settings (ⓘ): turn on **Show on Apple Watch**.
 
@@ -128,7 +127,7 @@ Shortcuts → **Automation → + → Time of Day**, 8:00 AM, Daily, **Run Immedi
 2. **Get Details of Health Samples** → **Duration**.
 3. **Calculate Statistics** → **Sum**.
 4. **Get Contents of URL** → `https://YOUR-APP.vercel.app/api/health`, Method **POST**,
-   Authorization header, Request Body **JSON**: `sleep_minutes` (Number) = *Statistics*.
+   Request Body **JSON**: `sleep_minutes` (Number) = *Statistics*, `token` (Text) = your token.
 
 Check the first run: the Today screen should show something like "Slept 6h 12m". If the
 number is 60 times too big, your Shortcuts reports seconds: add **Calculate** ÷ 60 before
@@ -143,8 +142,8 @@ Automation → **Time of Day**, 9:30 PM, Daily, **Run Immediately**.
    aren't counted twice. Compare with the Health app the first time.)
 2. **Get Details of Health Samples** → **Value**.
 3. **Calculate Statistics** → **Sum**.
-4. **Get Contents of URL** → `/api/health`, POST, Authorization header,
-   JSON: `steps` (Number) = *Statistics*.
+4. **Get Contents of URL** → `/api/health`, POST, JSON: `steps` (Text) = *Statistics*
+   (pick the "Get Sum of Value" action as the variable), `token` (Text) = your token.
 
 10,000 or more checks off **10k steps** automatically.
 
@@ -152,7 +151,7 @@ Automation → **Time of Day**, 9:30 PM, Daily, **Run Immediately**.
 
 ## API reference
 
-All endpoints need `Authorization: Bearer <token>`. Dates are `YYYY-MM-DD` and default to
+All endpoints need your token: a `token` field in the JSON body, `?token=` in the URL, or an `Authorization: Bearer <token>` header. Dates are `YYYY-MM-DD` and default to
 today in your home time zone (Settings).
 
 | Endpoint | Body / query | Does |
